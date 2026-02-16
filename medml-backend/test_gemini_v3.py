@@ -22,21 +22,21 @@ with open('gemini_diagnostics.txt', 'w', encoding='utf-8') as f:
                 if 'generateContent' in m.supported_generation_methods:
                     f.write(f"- {m.name}\n")
             
-            f.write("\nAttempting generation with gemini-1.5-flash:\n")
+            f.write("\nAttempting generation with gemini-flash-latest:\n")
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-flash-latest')
                 response = model.generate_content("Ping")
                 f.write(f"Response: {response.text}\n")
             except Exception as e:
-                f.write(f"Error with gemini-1.5-flash: {e}\n")
+                f.write(f"Error with gemini-flash-latest: {e}\n")
                 
-            f.write("\nAttempting generation with gemini-pro:\n")
+            f.write("\nAttempting generation with gemini-pro-latest:\n")
             try:
-                model = genai.GenerativeModel('gemini-pro')
+                model = genai.GenerativeModel('gemini-pro-latest')
                 response = model.generate_content("Ping")
                 f.write(f"Response: {response.text}\n")
             except Exception as e:
-                f.write(f"Error with gemini-pro: {e}\n")
+                f.write(f"Error with gemini-pro-latest: {e}\n")
 
         except Exception:
             f.write("\nFATAL ERROR:\n")

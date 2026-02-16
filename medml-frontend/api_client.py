@@ -2,8 +2,11 @@ import streamlit as st
 import requests
 import json
 
+import os
+
 # --- BASE_URL ---
-BASE_URL = "http://127.0.0.1:5000/api/v1"
+# Use environment variable for production, fallback to localhost for development
+BASE_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:5000/api/v1")
 
 def get_token():
     """Retrieves the auth token from session state."""

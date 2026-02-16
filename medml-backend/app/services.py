@@ -333,17 +333,27 @@ def get_chatbot_response(message: str, history: List[Dict[str, str]] = None) -> 
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-flash-latest')
         system_instruction = "You are 'PreventVance AI', a medical assistant. Help with risks, care advice, and platform features. Don't diagnose. Urge ER for emergencies."
+        model = genai.GenerativeModel('gemini-flash-latest', system_instruction=system_instruction)
+        
         formatted_history = []
         if history:
+            # Filter out the current message if it's already in the history to avoid role conflict
             for entry in history:
+                content = entry.get("content", "").strip()
+                if not content: continue
+                
                 role = "user" if entry.get("role") == "user" else "model"
-                formatted_history.append({"role": role, "parts": [entry.get("content", "")]})
+                
+                # If the last message in history is from 'user' and matches current message, skip it
+                if role == "user" and content == message.strip():
+                    continue
+                    
+                formatted_history.append({"role": role, "parts": [content]})
 
         chat = model.start_chat(history=formatted_history)
-        response = chat.send_message(f"SYSTEM: {system_instruction}\nUSER: {message}")
+        response = chat.send_message(message)
         return response.text
     except Exception as e:
         current_app.logger.error(f"Chatbot error: {e}")
-        return "I encountered an error processing your request."
+        return f"I encountered an error: {str(e)}"
