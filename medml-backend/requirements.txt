@@ -1,0 +1,20 @@
+Flask
+flask-mongoengine
+mongoengine
+dnspython
+Flask-JWT-Extended
+Flask-Bcrypt
+Flask-Cors
+python-dotenv
+pydantic
+pydantic[email]
+scikit-learn
+pandas
+joblib
+xgboost
+lightgbm
+imbalanced-learn
+fpdf
+Flask-Limiter
+google-generativeai
+pip-system-certs # Added to help with SSL if needed on some systems

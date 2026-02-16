@@ -1,0 +1,539 @@
+{
+  "api_base_url": "http://127.0.0.1:5000/api/v1",
+  "authentication": {
+    "method": "JWT",
+    "token_header": "Authorization: Bearer <token>",
+    "token_creation_endpoints": [
+      "/auth/admin/login",
+      "/auth/patient/login"
+    ],
+    "token_refresh_endpoint": "/auth/refresh",
+    "logout_endpoint": "/auth/logout"
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/auth/admin/register",
+      "description": "Register a new admin (healthcare worker)",
+      "auth_required": false,
+      "rate_limit": "5 per hour",
+      "request_body": {
+        "name": "string (2-150 chars)",
+        "email": "email",
+        "username": "string (3-80 chars, optional)",
+        "password": "string (8+ chars, complex)",
+        "designation": "string (max 100 chars, optional)",
+        "contact_number": "string (max 20 chars, optional)",
+        "facility_name": "string (max 150 chars, optional)"
+      },
+      "response_body": {
+        "message": "Admin registered successfully",
+        "user": "admin_object"
+      },
+      "source_file": "medml-backend/app/api/auth.py",
+      "line_range": "21-60"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/admin/login",
+      "description": "Login admin using username/email and password",
+      "auth_required": false,
+      "rate_limit": "10 per minute",
+      "request_body": {
+        "username": "string (username or email)",
+        "password": "string"
+      },
+      "response_body": {
+        "message": "Admin login successful",
+        "access_token": "jwt_token",
+        "refresh_token": "jwt_token",
+        "admin_id": "integer",
+        "name": "string"
+      },
+      "source_file": "medml-backend/app/api/auth.py",
+      "line_range": "62-99"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/patient/login",
+      "description": "Login patient using ABHA ID and password",
+      "auth_required": false,
+      "rate_limit": "10 per minute",
+      "request_body": {
+        "abha_id": "string (14 digits)",
+        "password": "string"
+      },
+      "response_body": {
+        "message": "Patient login successful",
+        "access_token": "jwt_token",
+        "refresh_token": "jwt_token",
+        "patient_id": "integer",
+        "name": "string"
+      },
+      "source_file": "medml-backend/app/api/auth.py",
+      "line_range": "101-130"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/refresh",
+      "description": "Refresh access token using refresh token",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "access_token": "jwt_token",
+        "refresh_token": "jwt_token"
+      },
+      "source_file": "medml-backend/app/api/auth.py",
+      "line_range": "133-158"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "description": "Logout user by blocklisting token",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "message": "Token successfully revoked"
+      },
+      "source_file": "medml-backend/app/api/auth.py",
+      "line_range": "161-179"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "description": "Get current user profile (admin or patient)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "admin_object_or_patient_object": "varies_by_role"
+      },
+      "source_file": "medml-backend/app/api/auth.py",
+      "line_range": "182-217"
+    },
+    {
+      "method": "POST",
+      "path": "/patients",
+      "description": "Create new patient (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "name": "string (2-150 chars)",
+        "age": "integer (1-120)",
+        "gender": "string (Male/Female)",
+        "height": "float (cm)",
+        "weight": "float (kg)",
+        "abha_id": "string (14 digits)",
+        "state_name": "string (optional)",
+        "password": "string (8+ chars, complex)"
+      },
+      "response_body": {
+        "message": "Patient created successfully",
+        "patient": "patient_object",
+        "patient_id": "integer",
+        "name": "string"
+      },
+      "source_file": "medml-backend/app/api/patients.py",
+      "line_range": "12-65"
+    },
+    {
+      "method": "GET",
+      "path": "/patients",
+      "description": "Get list of patients with filtering (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "query_parameters": {
+        "disease": "string (diabetes/liver/heart/mental_health)",
+        "sort": "string (recently_added/high_risk/medium_risk)"
+      },
+      "response_body": "array_of_patient_objects",
+      "source_file": "medml-backend/app/api/patients.py",
+      "line_range": "67-133"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patient_id}",
+      "description": "Get detailed patient info (admin/patient - patient can only access own)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": "patient_object_with_full_history",
+      "source_file": "medml-backend/app/api/patients.py",
+      "line_range": "136-159"
+    },
+    {
+      "method": "PUT",
+      "path": "/patients/{patient_id}",
+      "description": "Update patient basic info (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "name": "string (2-150 chars)",
+        "age": "integer (1-120)",
+        "gender": "string (Male/Female)",
+        "height": "float (cm)",
+        "weight": "float (kg)",
+        "abha_id": "string (14 digits)",
+        "state_name": "string (optional)"
+      },
+      "response_body": {
+        "message": "Patient updated successfully",
+        "patient": "patient_object"
+      },
+      "source_file": "medml-backend/app/api/patients.py",
+      "line_range": "162-199"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patient_id}/assessments/diabetes",
+      "description": "Create diabetes assessment (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "pregnancy": "boolean",
+        "glucose": "float",
+        "blood_pressure": "float",
+        "skin_thickness": "float",
+        "insulin": "float",
+        "diabetes_history": "boolean"
+      },
+      "response_body": {
+        "message": "DiabetesAssessment created successfully",
+        "assessment": "assessment_object"
+      },
+      "source_file": "medml-backend/app/api/assessments.py",
+      "line_range": "58-65"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patient_id}/assessments/liver",
+      "description": "Create liver assessment (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "total_bilirubin": "float",
+        "direct_bilirubin": "float",
+        "alkaline_phosphatase": "float",
+        "sgpt_alamine_aminotransferase": "float",
+        "sgot_aspartate_aminotransferase": "float",
+        "total_protein": "float",
+        "albumin": "float"
+      },
+      "response_body": {
+        "message": "LiverAssessment created successfully",
+        "assessment": "assessment_object"
+      },
+      "source_file": "medml-backend/app/api/assessments.py",
+      "line_range": "67-74"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patient_id}/assessments/heart",
+      "description": "Create heart assessment (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "diabetes": "boolean",
+        "hypertension": "boolean",
+        "obesity": "boolean",
+        "smoking": "boolean",
+        "alcohol_consumption": "boolean",
+        "physical_activity": "boolean",
+        "diet_score": "integer (1-10, optional)",
+        "cholesterol_level": "float",
+        "triglyceride_level": "float (optional)",
+        "ldl_level": "float (optional)",
+        "hdl_level": "float (optional)",
+        "systolic_bp": "integer",
+        "diastolic_bp": "integer",
+        "air_pollution_exposure": "float (optional)",
+        "family_history": "boolean",
+        "stress_level": "integer (1-10, optional)",
+        "heart_attack_history": "boolean"
+      },
+      "response_body": {
+        "message": "HeartAssessment created successfully",
+        "assessment": "assessment_object"
+      },
+      "source_file": "medml-backend/app/api/assessments.py",
+      "line_range": "76-83"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patient_id}/assessments/mental_health",
+      "description": "Create mental health assessment (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "phq_score": "integer (0-27)",
+        "gad_score": "integer (0-21)",
+        "depressiveness": "boolean",
+        "suicidal": "boolean",
+        "anxiousness": "boolean",
+        "sleepiness": "boolean"
+      },
+      "response_body": {
+        "message": "MentalHealthAssessment created successfully",
+        "assessment": "assessment_object"
+      },
+      "source_file": "medml-backend/app/api/assessments.py",
+      "line_range": "85-92"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patient_id}/assessments",
+      "description": "Get all assessments for patient (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "patient_id": "integer",
+        "assessments": {
+          "diabetes": "array_of_assessment_objects",
+          "liver": "array_of_assessment_objects",
+          "heart": "array_of_assessment_objects",
+          "mental_health": "array_of_assessment_objects"
+        }
+      },
+      "source_file": "medml-backend/app/api/assessments.py",
+      "line_range": "94-109"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patient_id}/predict",
+      "description": "Trigger ML prediction for all diseases (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "message": "Risk prediction completed successfully.",
+        "predictions": "prediction_object"
+      },
+      "source_file": "medml-backend/app/api/predict.py",
+      "line_range": "72-89"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patient_id}/predictions/latest",
+      "description": "Get latest risk prediction (admin/patient - patient can only access own)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": "prediction_object",
+      "source_file": "medml-backend/app/api/predict.py",
+      "line_range": "92-116"
+    },
+    {
+      "method": "GET",
+      "path": "/dashboard/stats",
+      "description": "Get dashboard analytics (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "today_registrations": "integer",
+        "total_patients": "integer",
+        "diabetes_risk_count": "integer",
+        "liver_risk_count": "integer",
+        "heart_risk_count": "integer",
+        "mental_health_risk_count": "integer"
+      },
+      "source_file": "medml-backend/app/api/dashboard.py",
+      "line_range": "10-58"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patient_id}/report/pdf",
+      "description": "Generate PDF report (admin/patient - patient can only access own)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "sections": "array_of_strings (Overview, Diabetes, Liver, Heart, MentalHealth)"
+      },
+      "response_body": "pdf_file_content",
+      "source_file": "medml-backend/app/api/reports.py",
+      "line_range": "78-184"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patient_id}/recommendations",
+      "description": "Get lifestyle recommendations (admin/patient - patient can only access own)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "diet": "array_of_recommendation_objects",
+        "exercise": "array_of_recommendation_objects",
+        "sleep": "array_of_recommendation_objects",
+        "lifestyle": "array_of_recommendation_objects"
+      },
+      "source_file": "medml-backend/app/api/recommendations.py",
+      "line_range": "9-48"
+    },
+    {
+      "method": "POST",
+      "path": "/consultations",
+      "description": "Book consultation (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "patient_id": "integer",
+        "disease": "string",
+        "consultation_type": "string (teleconsultation/in_person)"
+      },
+      "response_body": {
+        "message": "Consultation booked successfully",
+        "consultation": "consultation_object"
+      },
+      "source_file": "medml-backend/app/api/consultations.py",
+      "line_range": "13-62"
+    },
+    {
+      "method": "GET",
+      "path": "/consultations/patient/{patient_id}",
+      "description": "Get patient consultations (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {},
+      "response_body": {
+        "consultations": "array_of_consultation_objects"
+      },
+      "source_file": "medml-backend/app/api/consultations.py",
+      "line_range": "64-73"
+    },
+    {
+      "method": "POST",
+      "path": "/consultations/notes",
+      "description": "Add consultation notes (admin only)",
+      "auth_required": true,
+      "rate_limit": null,
+      "request_body": {
+        "patient_id": "integer",
+        "notes": "string (min 1 char)"
+      },
+      "response_body": {
+        "message": "Note added successfully",
+        "note": "note_object"
+      },
+      "source_file": "medml-backend/app/api/consultations.py",
+      "line_range": "81-113"
+    }
+  ],
+  "ml_prediction_patterns": {
+    "internal_function_calls": {
+      "run_prediction": {
+        "file": "medml-backend/app/services.py",
+        "function": "run_prediction(assessment_type, input_data)",
+        "supported_types": ["diabetes", "heart", "liver", "mental_health"],
+        "returns": "float (probability score 0-1)"
+      }
+    },
+    "model_files": {
+      "diabetes": "diabetes_XGBoost.pkl",
+      "heart": "heart_best_model.pkl", 
+      "liver": "liver_LightGBM SMOTE.pkl",
+      "mental_health": "mental_health_depressiveness.pkl"
+    },
+    "prediction_endpoint": "/patients/{patient_id}/predict",
+    "prediction_trigger": "POST request triggers run_prediction for all 4 diseases"
+  },
+  "database_models": {
+    "User": {
+      "table": "users",
+      "fields": ["id", "name", "email", "username", "password_hash", "designation", "contact_number", "facility_name", "role", "created_at"],
+      "computed_fields": [],
+      "relationships": ["patients", "booked_consultations", "consultation_notes"]
+    },
+    "Patient": {
+      "table": "patients", 
+      "fields": ["id", "name", "age", "gender", "height", "weight", "abha_id", "password_hash", "state_name", "created_by_admin_id", "created_at", "updated_at"],
+      "computed_fields": ["bmi"],
+      "relationships": ["diabetes_assessments", "liver_assessments", "heart_assessments", "mental_health_assessments", "risk_predictions", "consultations", "consultation_notes"]
+    },
+    "DiabetesAssessment": {
+      "table": "diabetes_assessments",
+      "fields": ["id", "patient_id", "assessed_at", "assessed_by_admin_id", "pregnancy", "glucose", "blood_pressure", "skin_thickness", "insulin", "diabetes_history"],
+      "computed_fields": [],
+      "relationships": ["patient"]
+    },
+    "LiverAssessment": {
+      "table": "liver_assessments",
+      "fields": ["id", "patient_id", "assessed_at", "assessed_by_admin_id", "total_bilirubin", "direct_bilirubin", "alkaline_phosphatase", "sgpt_alamine_aminotransferase", "sgot_aspartate_aminotransferase", "total_protein", "albumin"],
+      "computed_fields": ["ag_ratio"],
+      "relationships": ["patient"]
+    },
+    "HeartAssessment": {
+      "table": "heart_assessments",
+      "fields": ["id", "patient_id", "assessed_at", "assessed_by_admin_id", "diabetes", "hypertension", "obesity", "smoking", "alcohol_consumption", "physical_activity", "diet_score", "cholesterol_level", "triglyceride_level", "ldl_level", "hdl_level", "systolic_bp", "diastolic_bp", "air_pollution_exposure", "family_history", "stress_level", "heart_attack_history"],
+      "computed_fields": [],
+      "relationships": ["patient"]
+    },
+    "MentalHealthAssessment": {
+      "table": "mental_health_assessments",
+      "fields": ["id", "patient_id", "assessed_at", "assessed_by_admin_id", "phq_score", "gad_score", "depressiveness", "suicidal", "anxiousness", "sleepiness"],
+      "computed_fields": [],
+      "relationships": ["patient"]
+    },
+    "RiskPrediction": {
+      "table": "risk_predictions",
+      "fields": ["id", "patient_id", "diabetes_risk_score", "diabetes_risk_level", "liver_risk_score", "liver_risk_level", "heart_risk_score", "heart_risk_level", "mental_health_risk_score", "mental_health_risk_level", "model_version", "predicted_at"],
+      "computed_fields": [],
+      "relationships": ["patient"]
+    },
+    "Consultation": {
+      "table": "consultations",
+      "fields": ["id", "patient_id", "admin_id", "disease", "consultation_type", "consultation_datetime", "notes", "status", "created_at"],
+      "computed_fields": [],
+      "relationships": ["patient", "booked_by_admin"]
+    },
+    "ConsultationNote": {
+      "table": "consultation_notes",
+      "fields": ["id", "patient_id", "admin_id", "notes", "created_at"],
+      "computed_fields": [],
+      "relationships": ["patient", "admin"]
+    },
+    "LifestyleRecommendation": {
+      "table": "lifestyle_recommendations",
+      "fields": ["id", "patient_id", "disease_type", "risk_level", "category", "recommendation_text", "priority", "created_at", "is_active"],
+      "computed_fields": [],
+      "relationships": ["patient"]
+    },
+    "TokenBlocklist": {
+      "table": "token_blocklist",
+      "fields": ["id", "jti", "token_type", "user_id", "created_at", "expires_at"],
+      "computed_fields": [],
+      "relationships": []
+    }
+  },
+  "computed_fields": {
+    "bmi": {
+      "formula": "weight_kg / (height_m)^2",
+      "units": "height in cm, weight in kg",
+      "model": "Patient"
+    },
+    "ag_ratio": {
+      "formula": "albumin / (total_protein - albumin)",
+      "units": "both in g/dL",
+      "model": "LiverAssessment"
+    }
+  },
+  "risk_thresholds": {
+    "low": 0.0,
+    "medium": 0.35,
+    "high": 0.70
+  },
+  "authentication_details": {
+    "jwt_identity_structure": {
+      "id": "user_id",
+      "role": "admin_or_patient",
+      "name": "user_name"
+    },
+    "token_expiry": {
+      "access_token": "15 minutes",
+      "refresh_token": "30 days"
+    }
+  }
+}

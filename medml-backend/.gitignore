@@ -1,0 +1,53 @@
+# Python
+*.pyc
+__pycache__/
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+env/
+.venv/
+env.bak/
+env/bin/activate
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs and caches
+*.log
+*.cache
+*.db
+
+# Build and deployment files
+*.zip
+*.tar.gz
+*.deb
+*.rpm
+
+# Test and coverage files
+*.pytest_cache/
+.coverage/
+.coverage.*
+.cache/
+nosetests.xml
+coverage.xml
+
+# Dependency files
+*.egg
+*.whl
+*.egg-info
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
